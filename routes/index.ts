@@ -1,9 +1,9 @@
-import tracking from "./tracking/tracking"
+import spreadsheet from "./read_spreadsheet/read_spreadsheet"
 
 let express = require("express")
 
 let app = express.Router()
 
-app.use("/readspreadsheet",tracking)
+app.use("/readspreadsheet",spreadsheet)
 
 export default app

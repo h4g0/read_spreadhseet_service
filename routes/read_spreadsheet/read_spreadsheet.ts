@@ -1,6 +1,5 @@
 import express from 'express'
-import { get_tracking } from '../../functions/tracking/parse_document'
-
+import { read_spreadsheet } from '../../functions/read_spreadsheet/read_spreadsheet'
 const dotenv = require('dotenv')
 const fileupload = require("express-fileupload")
 
@@ -29,9 +28,9 @@ app.post('/', async (req, res) => {
     //@ts-ignore
     await req.files.file.mv(fileloc)
     console.log(fileloc)
-    const trackings = get_tracking(fileloc)
+    const spreadsheet = read_spreadsheet(fileloc)
 
-    res.status(200).send("Success")
+    res.status(200).json(spreadsheet)
   }
   catch(e: any)
   {
