@@ -1,13 +1,6 @@
 import express from 'express'
 import { read_spreadsheet } from '../../functions/read_spreadsheet/read_spreadsheet'
-const dotenv = require('dotenv')
 const fileupload = require("express-fileupload")
-
-dotenv.config()
-
-const store:string = ( process.env.STORE as string ) 
-
-console.log( "store " + store)
 
 // Create a new instance of express
 const app = express.Router()
