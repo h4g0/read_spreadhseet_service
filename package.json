@@ -1,0 +1,36 @@
+{
+  "name": "ambar_mdw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "npx ts-node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://hugo-giao@bitbucket.org/valeriushub/ambar_mdw.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/valeriushub/ambar_mdw#readme",
+  "dependencies": {
+    "@types/axios": "^0.14.0",
+    "axios": "^0.21.1",
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
+    "jsonwebtoken": "^8.5.1",
+    "node-xlsx": "^0.17.1",
+    "xlsx": "^0.17.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.11",
+    "@types/node": "^15.6.0",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.2.4"
+  }
+}
