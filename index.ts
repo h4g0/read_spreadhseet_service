@@ -1,6 +1,5 @@
 const express = require('express');
 import routes from "./routes/index"
-const glpk = require('glpk.js');
 
 const bodyParser = require('body-parser')
 const dotenv = require('dotenv')
@@ -21,7 +20,7 @@ app.use("",routes)
 
 app.get('/', async (req: any, res: any) => {
 
-    require("clp-wasm/clp-wasm").then((clp: any) => {
+    /*require("clp-wasm/clp-wasm").then((clp: any) => {
         const lp = `Maximize
          obj: + 0.6 x1 + 0.5 x2
          Subject To
@@ -29,7 +28,7 @@ app.get('/', async (req: any, res: any) => {
          cons2: + 3 x1 + x2 <= 2
          End`;
         console.log(clp.solve(lp)); // Prints a result object with solution values, objective, etc.
-      });
+      });*/
 
     res.send('Well done!');
 })

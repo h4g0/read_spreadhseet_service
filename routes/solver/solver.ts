@@ -4,9 +4,7 @@ const fileupload = require("express-fileupload")
 
 // Create a new instance of express
 const app = express.Router()
-app.use(express.static("files"))
-
-app.use(fileupload())
+app.use(express.json())
 
 // Route that receives a POST request to /ordercreation
 app.post('/', async (req, res) => {
@@ -23,8 +21,10 @@ app.post('/', async (req, res) => {
 
          const lp = req.body.model
         
+         console.log(lp)
          const solution = clp.solve(lp)
          
+         console.log(solution)
          res.status(200).json(solution)
 
       });
