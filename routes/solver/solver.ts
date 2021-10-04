@@ -23,8 +23,8 @@ app.post('/', async (req, res) => {
         
          console.log(lp)
          const solution = clp.solve(lp)
-         
-         console.log(solution)
+         //const solution = {}
+         console.log(solution.variables)
          res.status(200).json(solution)
 
       });
