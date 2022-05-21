@@ -1,4 +1,5 @@
 const express = require('express');
+import { read_spreadsheet } from "./functions/read_spreadsheet/read_spreadsheet";
 import routes from "./routes/index"
 
 const bodyParser = require('body-parser')
@@ -29,6 +30,9 @@ app.get('/', async (req: any, res: any) => {
          End`;
         console.log(clp.solve(lp)); // Prints a result object with solution values, objective, etc.
       });*/
+
+    console.log(read_spreadsheet("./temp/Vegetables.xlsx"))
+    
 
     res.send('Well done!');
 })

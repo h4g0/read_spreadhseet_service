@@ -17,6 +17,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/valeriushub/ambar_mdw#readme",
   "dependencies": {
+    "@faker-js/faker": "^6.3.1",
     "@types/axios": "^0.14.0",
     "axios": "^0.21.1",
     "clp-wasm": "0.0.16",

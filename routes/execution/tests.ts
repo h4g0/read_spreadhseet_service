@@ -3,9 +3,7 @@ const fileupload = require("express-fileupload")
 
 // Create a new instance of express
 const app = express.Router()
-app.use(express.static("files"))
-
-app.use(fileupload())
+app.use(express.json())
 
 // Route that receives a POST request to /ordercreation
 app.post('/', async (req, res) => {

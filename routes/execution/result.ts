@@ -8,7 +8,7 @@ app.use(express.static("files"))
 app.use(fileupload())
 
 // Route that receives a POST request to /ordercreation
-app.post('/', async (req, res) => {
+app.get('/', async (req, res) => {
   
 
   try {
