@@ -1,4 +1,5 @@
 const express = require('express');
+import { fitness } from "./functions/optimization/fitness";
 import { generate_population } from "./functions/optimization/population";
 import routes from "./routes/index"
 
@@ -31,8 +32,12 @@ app.get('/', async (req: any, res: any) => {
         console.log(clp.solve(lp)); // Prints a result object with solution values, objective, etc.
       });*/
 
-    generate_population()
+    const population = generate_population(10000)
+    
+    const fitness_e = fitness(population)
 
+    console.log(fitness_e)
+    
     res.send('Well done!');
 })
 

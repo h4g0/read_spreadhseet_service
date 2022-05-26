@@ -32,10 +32,6 @@ function create_account_branch(accounts: accounts, name: string, country: string
         return [500,"500|Length of phone above 30 characters"]
     }
 
-    if(parseInt(phone.replace(/ /g,""))) {
-        return [500,"500|phone is not a number"]
-    }
-
     if(isNaN(Date.parse(datebirth))) {
         return [500,"500|Date is not in a valid format"]
     }
@@ -64,7 +60,13 @@ function create_account_branch(accounts: accounts, name: string, country: string
 
 function create_account(accounts_eur: accounts, accounts_us: accounts, name: string, country: string, address: string, phone: string, datebirth: string): string {
     
-    if(!["PT","FR","ES","IT","US"].includes(country)){
+    console.log(`country ${country}`)
+
+    if(!["FR","BE","BG","DK","DE","EE","IE",
+    "EL","ES","FR","HR","IT","CY","LV","LT",
+    "LU","HU","MT","NL","AT",
+    "PL","RO","SI","SK","FI","SE",
+    "PT","FR","ES","IT","US"].includes(country)){
         return "create_account|500|Country code not accepted"
     }
 
@@ -95,11 +97,13 @@ function check_account_exists(branch: string, accounts: accounts, account: numbe
 
 function check_funds(branch: string, accounts: accounts, account: number, ammount: number): string{
     
-    if(accounts.length < account  ) {
+    if(accounts.length <= account  ) {
         return `check_funds_branch|${branch}|500|Account non existent`
 
     }
 
+    console.log(accounts)
+    console.log(account)
     if(accounts[account].ammount <= ammount){
         return `check_funds_branch|${branch}|500|Not enough funds`
     }
@@ -136,17 +140,17 @@ function transfer_funds(accounts_eur: accounts, accounts_us: accounts,account1: 
     const account_has_funds = check_funds(account1_branch, account1_branch == "US" ? accounts_us : accounts_eur,
     account1_number,ammount)
 
-    let result = parseInt(account_has_funds.split("_")[2]) == 200
+    let result = parseInt(account_has_funds.split("|")[2]) == 200
 
     if(!result) 
     {
-        return `transfer_funds|500|${account_has_funds[3]} -> ${account_has_funds}`
+        return `transfer_funds|500|${account_has_funds.split("|")[3]} -> ${account_has_funds}`
     }
 
     const account_exists = check_account_exists(account2_branch, account2_branch == "US" ? accounts_us : accounts_eur,
              account2_number)
     
-    result = parseInt(account_exists.split("_")[2]) == 200
+    result = parseInt(account_exists.split("|")[2]) == 200
 
     if(!result) 
     {
@@ -171,11 +175,11 @@ function add_funds(accounts_eur: accounts, accounts_us: accounts, account: strin
     const account_exists = check_account_exists(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
              account_number)
         
-    const result = parseInt(account_exists.split("_")[2]) == 200
+    const result = parseInt(account_exists.split("|")[2]) == 200
 
     if(!result) 
     {
-        return `add_funds|500|${account_exists[3]} -> ${account_exists}`
+        return `add_funds|500|${account_exists.split("|")[3]} -> ${account_exists}`
     } 
 
     const afb = add_funds_branch(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
@@ -191,11 +195,11 @@ function retrieve_funds(accounts_eur: accounts, accounts_us: accounts, account: 
     const account_exists = check_funds(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
              account_number, ammount)
         
-    const result = parseInt(account_exists.split("_")[2]) == 200
+    const result = parseInt(account_exists.split("|")[2]) == 200
 
     if(!result) 
     {
-        return `retrieve_funds|500|${account_exists[3]} -> ${account_exists}`
+        return `retrieve_funds|500|${account_exists.split("|")[3]} -> ${account_exists}`
     } 
 
     const afb = remove_funds_branch(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
@@ -250,7 +254,10 @@ export function fitness(population: Population,coverage: number=0.8, tests: numb
         const trace = run_test(accounts_eur,accounts_us,element)
         traces.add(trace)
     }
-    
+
+
+    console.log(traces)
+
     fit = traces.size * 0.8 / (population.length * tests)
 
     return fit

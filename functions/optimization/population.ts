@@ -27,7 +27,7 @@ function generate_create_account(): Datatype {
     const country = Faker.default.address.countryCode()
     const address = Faker.default.address.zipCode()
     const phone = Faker.faker.phone.imei()
-    const datebirth = Faker.default.date.past()
+    const datebirth = Faker.default.date.past(100)
 
 
     return [endpoints.create_account,name,country,address,phone,datebirth]
@@ -53,7 +53,7 @@ function generate_transfer_funds(): Datatype {
 
 function cashout_funds(): Datatype{
     const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
-    const ammount = `${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,1000)}`
+    const ammount = getRandomInt(0,1000)
 
     return [endpoints.retrieve_funds,account,ammount]
 }
@@ -130,6 +130,7 @@ export function generate_population(size: number = 10): Population {
     
     for(let i = 0; i < size; i++){
        const element = get_random_element()
+       population.push(element)
        console.log(element)
     }
 
