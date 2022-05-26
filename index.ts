@@ -32,7 +32,7 @@ app.get('/', async (req: any, res: any) => {
         console.log(clp.solve(lp)); // Prints a result object with solution values, objective, etc.
       });*/
 
-    const population = generate_population(10000)
+    const population = generate_population(100)
     
     const fitness_e = fitness(population)
 

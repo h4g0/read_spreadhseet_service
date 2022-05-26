@@ -121,7 +121,6 @@ function remove_funds_branch(branch: string, accounts: accounts, account: number
 
 }
 
-
 function add_funds_branch(branch: string, accounts: accounts, account: number, ammount: number): string {
    
     accounts[account].ammount += ammount
