@@ -1,5 +1,5 @@
 const express = require('express');
-import { read_spreadsheet } from "./functions/read_spreadsheet/read_spreadsheet";
+import { generate_population } from "./functions/optimization/population";
 import routes from "./routes/index"
 
 const bodyParser = require('body-parser')
@@ -31,8 +31,7 @@ app.get('/', async (req: any, res: any) => {
         console.log(clp.solve(lp)); // Prints a result object with solution values, objective, etc.
       });*/
 
-    console.log(read_spreadsheet("./temp/Vegetables.xlsx"))
-    
+    generate_population()
 
     res.send('Well done!');
 })
