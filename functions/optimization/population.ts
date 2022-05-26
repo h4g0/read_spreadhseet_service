@@ -1,10 +1,11 @@
 import * as Faker from "@faker-js/faker"
+import { randomInt } from "crypto";
 
-type Datatype = any[]
+export type Datatype = any[]
 
 type ParametersPopulation = [number, Datatype][]
 
-export type Population = [any][]
+export type Population = any[][]
 
 function getRandomInt(min: number, max: number) {
     min = Math.ceil(min);
@@ -12,13 +13,14 @@ function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
-enum endpoints {
+export enum endpoints {
     create_account =  0,
     transfer_funds,
     add_funds,
     retrieve_funds,
 }
 
+const number_endpoints = 4
 
 function generate_create_account(): Datatype {
     const name = Faker.default.name.findName()
@@ -28,7 +30,7 @@ function generate_create_account(): Datatype {
     const datebirth = Faker.default.date.past()
 
 
-    return [name,country,address,phone,datebirth]
+    return [endpoints.create_account,name,country,address,phone,datebirth]
 }
 
 function generate_deposit_funds(): Datatype {
@@ -36,7 +38,7 @@ function generate_deposit_funds(): Datatype {
     const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
     const ammount = getRandomInt(0,1000)
 
-    return [account,ammount]
+    return [endpoints.add_funds,account,ammount]
 
 }
 
@@ -46,14 +48,14 @@ function generate_transfer_funds(): Datatype {
 
     const ammount = getRandomInt(0,1000)
 
-    return [account1,account2,ammount]
+    return [endpoints.transfer_funds,account1,account2,ammount]
 }
 
 function cashout_funds(): Datatype{
     const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
     const ammount = `${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,1000)}`
 
-    return [account,ammount]
+    return [endpoints.retrieve_funds,account,ammount]
 }
 
 function generate_datatype(endpoint: number): Datatype {
@@ -85,13 +87,51 @@ function generate_datatype(endpoint: number): Datatype {
     }
 }
 
-export function generate_population(): Population {
+export function permutation(population: Population,changes: number = 3): Population {
+    let new_population: Population = [...population]
+
+    const deletions = randomInt(0,changes)
+
+    for(let i = 0; i < deletions; i++){
+        const random_pos = randomInt(0, new_population.length)
+        new_population.splice(random_pos, 1)
+    }
+
+    const additions = randomInt(0,changes)
+
+    for(let i = 0; i < additions; i++){
+        const element = get_random_element()
+        new_population.push(element)
+    }
+
+    const reorderings = randomInt(0,changes)
+
+    for(let i = 0; i < reorderings; i++){
+        const element1 = randomInt(0,new_population.length)
+        const element2 = randomInt(0,new_population.length)
+
+        const element1_value = [...new_population[element1]]
+        new_population[element1] = [...new_population[element2]]
+        new_population[element2] = element1_value
+    }
+
+    return new_population
+}
+
+function get_random_element(): Datatype {
+    const endpoint = randomInt(0,number_endpoints)
+    const datatype = generate_datatype(endpoint)
+    
+    return datatype
+}
+
+export function generate_population(size: number = 10): Population {
     let population: Population  = []
     
-    for(let i = 0; i < 4; i++){
-       const datatype = generate_datatype(i)
-       console.log(datatype)
+    for(let i = 0; i < size; i++){
+       const element = get_random_element()
+       console.log(element)
     }
-    
+
     return population
 }

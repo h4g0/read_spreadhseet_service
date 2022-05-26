@@ -1,4 +1,4 @@
-import { Population } from "./population"
+import { Datatype, endpoints, Population } from "./population"
 
 type account = {
     name: string,
@@ -204,12 +204,54 @@ function retrieve_funds(accounts_eur: accounts, accounts_us: accounts, account: 
     return `retrieve_funds|200|Success -> ${afb}`
 }
 
-export function fitness(population: Population): number {
+
+function run_test(accounts_eur: accounts, accounts_us: accounts,datatype: Datatype): string {
+    const endpoint = datatype[0]
+
+    if(endpoint == endpoints.create_account){
+        const result = create_account(accounts_eur,accounts_us,datatype[1],
+                datatype[2],datatype[3],datatype[4],datatype[5])
+
+        return result
+    }
+
+    if(endpoint == endpoints.add_funds){
+        const result = add_funds(accounts_eur,accounts_us,datatype[1],datatype[2])
+
+        return result
+    }
+
+    if(endpoint == endpoints.retrieve_funds){
+        const result = retrieve_funds(accounts_eur, accounts_us, datatype[1],datatype[2])
+
+        return result
+    }
+
+    if(endpoint == endpoints.transfer_funds){
+        const result = transfer_funds(accounts_eur,accounts_us,datatype[1],datatype[2],datatype[3])
+
+        return result
+    }
+
+
+    return "Error"
+}
+
+export function fitness(population: Population,coverage: number=0.8, tests: number=0.2): number {
     let fit = 0
 
-    let accounts_eur = []
-    let accounts_us = []
+    const traces = new Set()
 
+    let accounts_eur: accounts = []
+    let accounts_us: accounts = []
+
+    
+    for(let element of population){
+        const trace = run_test(accounts_eur,accounts_us,element)
+        traces.add(trace)
+    }
+    
+    fit = traces.size * 0.8 / (population.length * tests)
 
     return fit
 }
