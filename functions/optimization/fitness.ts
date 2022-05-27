@@ -7,9 +7,11 @@ type account = {
     phone: string,
     datebirth: string,
     ammount: number,
+    frozen: boolean,
 }
 
 type accounts = account[]
+const international_transfer_fee = 2
 
 const getAge = (dateOfBirth: string, dateToCalculate = new Date()) => {
     const dob = new Date(dateOfBirth).getTime();
@@ -50,6 +52,7 @@ function create_account_branch(accounts: accounts, name: string, country: string
         phone: phone,
         datebirth: datebirth,
         ammount: 0,
+        frozen: false,
     }
 
     accounts.push(new_account)
@@ -121,6 +124,22 @@ function remove_funds_branch(branch: string, accounts: accounts, account: number
 
 }
 
+function freeze_account_branch(branch: string, accounts: accounts, account: number): string {
+   
+    accounts[account].frozen = true
+
+    return `freeze_account_branch|${branch}|Success`
+
+}
+
+function unfreeze_account_branch(branch: string, accounts: accounts, account: number): string {
+   
+    accounts[account].frozen = false
+
+    return `unfreeze_account_branch|${branch}|Success`
+
+}
+
 function add_funds_branch(branch: string, accounts: accounts, account: number, ammount: number): string {
    
     accounts[account].ammount += ammount
@@ -130,14 +149,14 @@ function add_funds_branch(branch: string, accounts: accounts, account: number, a
 }
 
 
-function transfer_funds(accounts_eur: accounts, accounts_us: accounts,account1: string, account2: string,ammount: number): string {
+function transfer_funds(accounts_eur: accounts, accounts_us: accounts,account1: string, account2: string,ammount: number,fee: number = 0): string {
     const account1_branch = account1.split("_")[0]
     const account2_branch = account2.split("_")[0]
     const account1_number = parseInt(account1.split("_")[1])
     const account2_number = parseInt(account2.split("_")[1])
 
     const account_has_funds = check_funds(account1_branch, account1_branch == "US" ? accounts_us : accounts_eur,
-    account1_number,ammount)
+    account1_number,ammount + fee)
 
     let result = parseInt(account_has_funds.split("|")[2]) == 200
 
@@ -164,6 +183,54 @@ function transfer_funds(accounts_eur: accounts, accounts_us: accounts,account1: 
     account2_number,ammount)
 
     return `transfer_funds|200|Success -> ; ${account_has_funds} ; ${account_exists}; (${rfb} | ${afb})`
+
+}
+
+function frozen_account_branch(branch: string, accounts: accounts, account: number): string {
+   
+    if(accounts[account].frozen)
+        return "frozen_account_branch|500|Account frozen"
+
+    return `frozen_account_branch|200|Success`
+
+}
+
+
+function local_transfer(accounts_eur: accounts, accounts_us: accounts,account1: string, account2: string,ammount: number): string {
+    const account1_branch = account1.split("_")[0]
+    const account2_branch = account2.split("_")[0]
+    const account1_number = parseInt(account1.split("_")[1])
+    const account2_number = parseInt(account2.split("_")[1])
+
+    if((account2_branch != "US" && account1_branch == "US") || (account1_branch == "US" && account1_branch != "US") )
+        return "local_transfer|500|different branches"
+
+    const tf = transfer_funds(accounts_eur,accounts_us,account1,account2,ammount)
+
+    const success = parseInt(tf.split("|")[2])
+
+    if(success != 200)
+        return `local_transfer|500|${tf.split("|")[3]} -> ${tf}`
+
+   
+
+    return `local_transfer|200|Success -> ${tf}`
+
+}
+
+function international_transfer(accounts_eur: accounts, accounts_us: accounts,account1: string, account2: string,ammount: number): string {
+   
+
+    const tf = transfer_funds(accounts_eur,accounts_us,account1,account2,ammount,international_transfer_fee)
+
+    const success = parseInt(tf.split("|")[2])
+
+    if(success != 200)
+        return `international_transfer|500|${tf.split("|")[3]} -> ${tf}`
+
+   
+
+    return `international_transfer|200|Success -> ${tf}`
 
 }
 
@@ -208,6 +275,46 @@ function retrieve_funds(accounts_eur: accounts, accounts_us: accounts, account: 
 }
 
 
+function freeze_account(accounts_eur: accounts, accounts_us: accounts, account: string): string {
+    const account_branch = account.split("_")[0]
+       const account_number = parseInt(account.split("_")[1])
+   
+       const account_exists = check_account_exists(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
+                account_number)
+           
+       const result = parseInt(account_exists.split("|")[2]) == 200
+   
+       if(!result) 
+       {
+           return `freeze_account|500|${account_exists.split("|")[3]} -> ${account_exists}`
+       } 
+   
+       const afb = freeze_account_branch(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
+       account_number)
+   
+       return `freeze_account|200|Success -> ${afb}`
+}
+   
+function unfreeze_account(accounts_eur: accounts, accounts_us: accounts, account: string): string {
+    const account_branch = account.split("_")[0]
+       const account_number = parseInt(account.split("_")[1])
+   
+       const account_exists = check_account_exists(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
+                account_number)
+           
+       const result = parseInt(account_exists.split("|")[2]) == 200
+   
+       if(!result) 
+       {
+           return `unfreeze_account|500|${account_exists.split("|")[3]} -> ${account_exists}`
+       } 
+   
+       const afb = unfreeze_account_branch(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
+       account_number)
+   
+       return `unfreeze_account|200|Success -> ${afb}`
+}
+
 function run_test(accounts_eur: accounts, accounts_us: accounts,datatype: Datatype): string {
     const endpoint = datatype[0]
 
@@ -230,12 +337,30 @@ function run_test(accounts_eur: accounts, accounts_us: accounts,datatype: Dataty
         return result
     }
 
-    if(endpoint == endpoints.transfer_funds){
-        const result = transfer_funds(accounts_eur,accounts_us,datatype[1],datatype[2],datatype[3])
+    if(endpoint == endpoints.local_transfer){
+        const result = local_transfer(accounts_eur,accounts_us,datatype[1],datatype[2],datatype[3])
 
         return result
     }
 
+    if(endpoint == endpoints.international_transfer){
+        const result = international_transfer(accounts_eur,accounts_us,datatype[1],datatype[2],datatype[3])
+
+        return result
+    }
+
+
+    if(endpoint == endpoints.freeze_account){
+        const result = freeze_account(accounts_eur,accounts_us,datatype[1])
+        
+        return result
+    }
+
+    if(endpoint == endpoints.unfreeze_account){
+        const result = unfreeze_account(accounts_eur,accounts_us,datatype[1])
+
+        return result
+    }
 
     return "Error"
 }

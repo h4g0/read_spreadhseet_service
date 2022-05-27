@@ -15,12 +15,15 @@ function getRandomInt(min: number, max: number) {
 
 export enum endpoints {
     create_account =  0,
-    transfer_funds,
+    international_transfer,
+    local_transfer,
     add_funds,
     retrieve_funds,
+    freeze_account,
+    unfreeze_account,
 }
 
-const number_endpoints = 4
+const number_endpoints = 7
 
 function generate_create_account(): Datatype {
     const name = Faker.default.name.findName()
@@ -42,13 +45,34 @@ function generate_deposit_funds(): Datatype {
 
 }
 
-function generate_transfer_funds(): Datatype {
+function generate_local_transfer_funds(): Datatype {
     const account1 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
     const account2 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
 
     const ammount = getRandomInt(0,1000)
 
-    return [endpoints.transfer_funds,account1,account2,ammount]
+    return [endpoints.local_transfer,account1,account2,ammount]
+}
+
+function generate_freeze_account(): Datatype {
+    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+
+    return [endpoints.freeze_account, account]
+}
+
+function generate_unfreeze_account(): Datatype {
+    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+
+    return [endpoints.freeze_account, account]
+}
+
+function generate_international_transfer_funds(): Datatype {
+    const account1 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+    const account2 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+
+    const ammount = getRandomInt(0,1000)
+
+    return [endpoints.local_transfer,account1,account2,ammount]
 }
 
 function cashout_funds(): Datatype{
@@ -72,12 +96,24 @@ function generate_datatype(endpoint: number): Datatype {
             return cashout_funds()
             break;
         }
-        case endpoints.transfer_funds: {
-            return generate_transfer_funds()
+        case endpoints.international_transfer: {
+            return generate_international_transfer_funds()
+            break;
+        }
+        case endpoints.local_transfer: {
+            return generate_local_transfer_funds()
             break;
         }
         case endpoints.create_account: {
             return generate_create_account()
+            break;
+        }
+        case endpoints.freeze_account: {
+            return generate_freeze_account()
+            break;
+        }
+        case endpoints.unfreeze_account: {
+            return generate_unfreeze_account()
             break;
         }
         default: {
