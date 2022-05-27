@@ -195,6 +195,12 @@ function frozen_account_branch(branch: string, accounts: accounts, account: numb
 
 }
 
+function frozen_account(account: string): string {
+
+
+
+}
+
 
 function local_transfer(accounts_eur: accounts, accounts_us: accounts,account1: string, account2: string,ammount: number): string {
     const account1_branch = account1.split("_")[0]
