@@ -1,5 +1,6 @@
 const express = require('express');
 import { fitness } from "./functions/optimization/fitness";
+import { hillClimbing } from "./functions/optimization/optimization";
 import { generate_population } from "./functions/optimization/population";
 import routes from "./routes/index"
 
@@ -22,21 +23,11 @@ app.use("",routes)
 
 app.get('/', async (req: any, res: any) => {
 
-    /*require("clp-wasm/clp-wasm").then((clp: any) => {
-        const lp = `Maximize
-         obj: + 0.6 x1 + 0.5 x2
-         Subject To
-         cons1: + x1  <= 1
-         cons2: + 3 x1 + x2 <= 2
-         End`;
-        console.log(clp.solve(lp)); // Prints a result object with solution values, objective, etc.
-      });*/
-
-    const population = generate_population(100)
+    //const population = generate_population(100)
     
-    const fitness_e = fitness(population)
-
-    console.log(fitness_e)
+    //const fitness_e = fitness(population)
+    const solution = hillClimbing(100000)
+    console.log(solution)
     
     res.send('Well done!');
 })

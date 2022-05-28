@@ -63,7 +63,6 @@ function create_account_branch(accounts: accounts, name: string, country: string
 
 function create_account(accounts_eur: accounts, accounts_us: accounts, name: string, country: string, address: string, phone: string, datebirth: string): string {
     
-    console.log(`country ${country}`)
 
     if(!["FR","BE","BG","DK","DE","EE","IE",
     "EL","ES","FR","HR","IT","CY","LV","LT",
@@ -105,8 +104,6 @@ function check_funds(branch: string, accounts: accounts, account: number, ammoun
 
     }
 
-    console.log(accounts)
-    console.log(account)
     if(accounts[account].ammount <= ammount){
         return `check_funds_branch|${branch}|500|Not enough funds`
     }
@@ -175,6 +172,23 @@ function transfer_funds(accounts_eur: accounts, accounts_us: accounts,account1: 
         return `transfer_funds|500|${account_exists[3]} -> ${account_exists}`
     } 
 
+    const account1_frozen = frozen_account(accounts_eur, accounts_us, account1)
+    
+    result = parseInt(account1_frozen.split("|")[2]) == 200
+
+    if(!result) 
+    {
+        return `transfer_funds|500|account1 frozen:${account1_frozen} -> ${account1_frozen}`
+    } 
+
+    const account2_frozen = frozen_account(accounts_eur, accounts_us,account2)
+    
+    result = parseInt(account2_frozen.split("|")[2]) == 200
+
+    if(!result) 
+    {
+        return `transfer_funds|500|account2 frozen:${account2_frozen} -> ${account2_frozen}`
+    } 
 
     const rfb = remove_funds_branch(account1_branch, account1_branch == "US" ? accounts_us : accounts_eur,
     account1_number,ammount)
@@ -195,9 +209,19 @@ function frozen_account_branch(branch: string, accounts: accounts, account: numb
 
 }
 
-function frozen_account(account: string): string {
+function frozen_account(accounts_eur: accounts,accounts_us: accounts,account: string): string {
 
+    const account_branch = account.split("_")[0]
+    const account_number = parseInt(account.split("_")[1])
 
+    const fab = frozen_account_branch(account_branch, account_branch == "US" ? accounts_us : accounts_eur, account_number )
+    const result = parseInt(fab.split("|")[2]) == 200
+
+    if(!result) {
+        return `frozen_account|500|${fab.split("|")[3]} -> ${fab}`
+    }
+
+    return `frozen_account|200|Success -> ${fab}`
 
 }
 
@@ -386,9 +410,7 @@ export function fitness(population: Population,coverage: number=0.8, tests: numb
     }
 
 
-    console.log(traces)
 
-    fit = traces.size * 0.8 / (population.length * tests)
-
+    fit = traces.size
     return fit
 }

@@ -167,7 +167,6 @@ export function generate_population(size: number = 10): Population {
     for(let i = 0; i < size; i++){
        const element = get_random_element()
        population.push(element)
-       console.log(element)
     }
 
     return population
