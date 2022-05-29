@@ -104,7 +104,7 @@ function check_funds(branch: string, accounts: accounts, account: number, ammoun
 
     }
 
-    if(accounts[account].ammount <= ammount){
+    if(accounts[account].ammount < ammount){
         return `check_funds_branch|${branch}|500|Not enough funds`
     }
 
@@ -174,11 +174,11 @@ function transfer_funds(accounts_eur: accounts, accounts_us: accounts,account1: 
 
     const account1_frozen = frozen_account(accounts_eur, accounts_us, account1)
     
-    result = parseInt(account1_frozen.split("|")[2]) == 200
+    result = parseInt(account1_frozen.split("|")[1]) == 200
 
     if(!result) 
     {
-        return `transfer_funds|500|account1 frozen:${account1_frozen} -> ${account1_frozen}`
+        return `transfer_funds|500|account1 frozen:${account1_frozen.split("|")[2]} -> ${account1_frozen}`
     } 
 
     const account2_frozen = frozen_account(accounts_eur, accounts_us,account2)
@@ -203,9 +203,9 @@ function transfer_funds(accounts_eur: accounts, accounts_us: accounts,account1: 
 function frozen_account_branch(branch: string, accounts: accounts, account: number): string {
    
     if(accounts[account].frozen)
-        return "frozen_account_branch|500|Account frozen"
+        return `frozen_account_branch|${branch}|500|Account frozen`
 
-    return `frozen_account_branch|200|Success`
+    return `frozen_account_branch|${branch}|200||Success`
 
 }
 
@@ -395,7 +395,54 @@ function run_test(accounts_eur: accounts, accounts_us: accounts,datatype: Dataty
     return "Error"
 }
 
-export function fitness(population: Population,coverage: number=0.8, tests: number=0.2): number {
+function get_endpoint(endpoint: number): string {
+    
+    if(endpoint == endpoints.add_funds) return "add_funds"
+    if(endpoint == endpoints.create_account) return "create_account"
+    if(endpoint == endpoints.freeze_account) return "freeze_account"
+    if(endpoint == endpoints.international_transfer) return "international_transfer"
+    if(endpoint == endpoints.local_transfer) return "local_transfer"
+    if(endpoint == endpoints.retrieve_funds) return "retrienve_funds"
+    if(endpoint == endpoints.unfreeze_account) return "unfreeze_account"
+
+    return "not_found"
+
+}
+
+function pretty_element(element: any[]): string {
+    const endpoint = get_endpoint(element[0])
+
+    const args = element.slice(1).join(" ; ")
+
+    const pretty_element = `${endpoint} ${args}`
+
+    return pretty_element
+}
+
+export function pretty_print_population(population: Population): void {
+
+    let accounts_eur: accounts = []
+    let accounts_us: accounts = []
+
+    for(let element of population) {
+        const pe = pretty_element(element)
+
+
+        console.log("<____________________________________________________________________")
+        
+        console.log(pe)
+
+        const trace = run_test(accounts_eur,accounts_us,element)
+
+        console.log(trace)
+
+        console.log("____________________________________________________________________>")
+
+
+    }
+}
+
+export function fitness(population: Population,coverage: number=0.8, tests: number=0.2): [number,Set<unknown>] {
     let fit = 0
 
     const traces = new Set()
@@ -412,5 +459,5 @@ export function fitness(population: Population,coverage: number=0.8, tests: numb
 
 
     fit = traces.size
-    return fit
+    return [fit,traces]
 }

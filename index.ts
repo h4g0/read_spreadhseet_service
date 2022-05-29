@@ -1,7 +1,7 @@
 const express = require('express');
-import { fitness } from "./functions/optimization/fitness";
-import { hillClimbing } from "./functions/optimization/optimization";
-import { generate_population } from "./functions/optimization/population";
+import { fitness, pretty_print_population } from "./functions/optimization/fitness";
+import { hillClimbing, SimulatedAnnealing } from "./functions/optimization/optimization";
+import { endpoints, generate_population } from "./functions/optimization/population";
 import routes from "./routes/index"
 
 const bodyParser = require('body-parser')
@@ -23,11 +23,64 @@ app.use("",routes)
 
 app.get('/', async (req: any, res: any) => {
 
+    const test_fitness = [
+        [endpoints.create_account, "Fake Name", "US", "4711","911222333","1994-10-10"],
+        [endpoints.create_account, "Fake Name", "PT", "4711","911222333","1994-10-10"],
+        [endpoints.create_account, "Fake Name", "CHZK", "4711","911222333","1994-10-10"],
+        [endpoints.create_account, "Fake Name", "US", "4711","911222333","2020-10-10"],
+        [endpoints.create_account, "Fake Name", "PT", "4711","911222333","2020-10-10"],
+        [endpoints.add_funds, "US_5",10],
+        [endpoints.add_funds, "US_0",10],
+        [endpoints.add_funds, "EUR_5",10],
+        [endpoints.add_funds, "EUR_0",10],
+        [endpoints.retrieve_funds,"EUR_0",5],
+        [endpoints.retrieve_funds,"US_0",5],
+        [endpoints.retrieve_funds,"EUR_1",5],
+        [endpoints.retrieve_funds,"US_1",5],
+        [endpoints.retrieve_funds,"EUR_0",20],
+        [endpoints.retrieve_funds,"US_0",20],
+        [endpoints.local_transfer,"US_0","US_0",5],
+        [endpoints.local_transfer,"EUR_0","EUR_0",5],
+        [endpoints.local_transfer,"EUR_0","US_0",5],
+        [endpoints.local_transfer,"US_0","US_1",5],
+        [endpoints.local_transfer,"EUR_0","EUR_1",5],
+        [endpoints.local_transfer,"US_0","US_0",100],
+        [endpoints.local_transfer,"EUR_0","EUR_0",100],
+        [endpoints.international_transfer,"EUR_0","US_0",100],
+        [endpoints.international_transfer,"EUR_1","US_0",100],
+        [endpoints.international_transfer,"EUR_1","US_2",100],
+        [endpoints.international_transfer,"US_0","EUR_0",100],
+        [endpoints.add_funds, "EUR_0",20],
+        [endpoints.add_funds, "US_0",20],
+        [endpoints.international_transfer,"EUR_0","US_2",5],
+        [endpoints.international_transfer,"EUR_0","US_0",5],
+        [endpoints.international_transfer,"US_0","EUR_0",5],
+        [endpoints.freeze_account,"US_1"],
+        [endpoints.freeze_account,"EUR_2"],
+        [endpoints.unfreeze_account,"US_1"],
+        [endpoints.unfreeze_account,"EUR_2"],
+        [endpoints.freeze_account,"US_0"],
+        [endpoints.freeze_account,"EUR_0"],
+        [endpoints.international_transfer,"EUR_0","US_0",5],
+        [endpoints.international_transfer,"US_0","EUR_0",5],
+        [endpoints.local_transfer,"US_0","US_0",5],
+        [endpoints.international_transfer,"EUR_0","EUR_0",5],
+        [endpoints.unfreeze_account,"US_0"],
+        [endpoints.unfreeze_account,"EUR_0"],
+
+
+
+
+
+
+    ]
     //const population = generate_population(100)
     
-    //const fitness_e = fitness(population)
-    const solution = hillClimbing(100000)
-    console.log(solution)
+    const fitness_e = fitness(test_fitness)
+    //const solution = SimulatedAnnealing(100000)
+    console.log(fitness_e)
+
+    //pretty_print_population(solution)
     
     res.send('Well done!');
 })

@@ -123,32 +123,65 @@ function generate_datatype(endpoint: number): Datatype {
     }
 }
 
+
+function deletion(population: Population): Population {
+    
+    let new_population: Population = [...population]
+
+    if(new_population.length == 0) return new_population
+
+    const random_pos = randomInt(0, new_population.length)
+    new_population.splice(random_pos, 1)
+
+    return new_population
+
+}
+
+function addition(population: Population): Population {
+    let new_population: Population = [...population]
+
+    const element = get_random_element()
+    new_population.push(element)
+
+    return new_population
+}
+
+function reordering(population: Population): Population {
+    let new_population: Population = [...population]
+
+    if(new_population.length == 0) return new_population
+
+    const element1 = randomInt(0,new_population.length)
+    const element2 = randomInt(0,new_population.length)
+
+    const element1_value = [...new_population[element1]]
+    new_population[element1] = [...new_population[element2]]
+    new_population[element2] = element1_value
+
+    return new_population
+}
+
 export function permutation(population: Population,changes: number = 3): Population {
+    
     let new_population: Population = [...population]
 
     const deletions = randomInt(0,changes)
 
     for(let i = 0; i < deletions; i++){
-        const random_pos = randomInt(0, new_population.length)
-        new_population.splice(random_pos, 1)
+        
+        new_population = deletion(new_population)
     }
 
     const additions = randomInt(0,changes)
 
     for(let i = 0; i < additions; i++){
-        const element = get_random_element()
-        new_population.push(element)
+      new_population = addition(new_population)
     }
 
     const reorderings = randomInt(0,changes)
 
     for(let i = 0; i < reorderings; i++){
-        const element1 = randomInt(0,new_population.length)
-        const element2 = randomInt(0,new_population.length)
-
-        const element1_value = [...new_population[element1]]
-        new_population[element1] = [...new_population[element2]]
-        new_population[element2] = element1_value
+        new_population = reordering(new_population)
     }
 
     return new_population
