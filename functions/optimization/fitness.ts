@@ -169,7 +169,7 @@ function transfer_funds(accounts_eur: accounts, accounts_us: accounts,account1: 
 
     if(!result) 
     {
-        return `transfer_funds|500|${account_exists[3]} -> ${account_exists}`
+        return `transfer_funds|500|${account_exists.split("|")[3]} -> ${account_exists}`
     } 
 
     const account1_frozen = frozen_account(accounts_eur, accounts_us, account1)
@@ -183,7 +183,7 @@ function transfer_funds(accounts_eur: accounts, accounts_us: accounts,account1: 
 
     const account2_frozen = frozen_account(accounts_eur, accounts_us,account2)
     
-    result = parseInt(account2_frozen.split("|")[2]) == 200
+    result = parseInt(account2_frozen.split("|")[1]) == 200
 
     if(!result) 
     {
@@ -237,10 +237,10 @@ function local_transfer(accounts_eur: accounts, accounts_us: accounts,account1: 
 
     const tf = transfer_funds(accounts_eur,accounts_us,account1,account2,ammount)
 
-    const success = parseInt(tf.split("|")[2])
+    const success = parseInt(tf.split("|")[1])
 
     if(success != 200)
-        return `local_transfer|500|${tf.split("|")[3]} -> ${tf}`
+        return `local_transfer|500|${tf.split("|")[2]} -> ${tf}`
 
    
 
@@ -253,10 +253,10 @@ function international_transfer(accounts_eur: accounts, accounts_us: accounts,ac
 
     const tf = transfer_funds(accounts_eur,accounts_us,account1,account2,ammount,international_transfer_fee)
 
-    const success = parseInt(tf.split("|")[2])
+    const success = parseInt(tf.split("|")[1])
 
     if(success != 200)
-        return `international_transfer|500|${tf.split("|")[3]} -> ${tf}`
+        return `international_transfer|500|${tf.split("|")[2]} -> ${tf}`
 
    
 
@@ -271,12 +271,24 @@ function add_funds(accounts_eur: accounts, accounts_us: accounts, account: strin
     const account_exists = check_account_exists(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
              account_number)
         
-    const result = parseInt(account_exists.split("|")[2]) == 200
+    let result = parseInt(account_exists.split("|")[2]) == 200
 
     if(!result) 
     {
         return `add_funds|500|${account_exists.split("|")[3]} -> ${account_exists}`
     } 
+
+    
+    const account_frozen = frozen_account(accounts_eur, accounts_us,account)
+    
+    result = parseInt(account_frozen.split("|")[1]) == 200
+
+    if(!result) 
+    {
+
+        return `add_funds|500|${account_frozen.split("|")[2]} -> ${account_frozen}`
+    } 
+
 
     const afb = add_funds_branch(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
     account_number,ammount)
@@ -291,13 +303,23 @@ function retrieve_funds(accounts_eur: accounts, accounts_us: accounts, account: 
     const account_exists = check_funds(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
              account_number, ammount)
         
-    const result = parseInt(account_exists.split("|")[2]) == 200
+    let result = parseInt(account_exists.split("|")[2]) == 200
 
     if(!result) 
     {
         return `retrieve_funds|500|${account_exists.split("|")[3]} -> ${account_exists}`
     } 
 
+    const account_frozen = frozen_account(accounts_eur, accounts_us,account)
+    
+    result = parseInt(account_frozen.split("|")[1]) == 200
+
+    if(!result) 
+    {
+
+        return `retrieve_funds|500|${account_frozen.split("|")[2]} -> ${account_frozen}`
+    } 
+    
     const afb = remove_funds_branch(account_branch, account_branch == "US" ? accounts_us : accounts_eur,
     account_number,ammount)
 

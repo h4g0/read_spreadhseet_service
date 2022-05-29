@@ -60,27 +60,29 @@ app.get('/', async (req: any, res: any) => {
         [endpoints.unfreeze_account,"US_1"],
         [endpoints.unfreeze_account,"EUR_2"],
         [endpoints.freeze_account,"US_0"],
+        [endpoints.international_transfer,"EUR_0","US_0",5],
+        [endpoints.create_account, "Fake Name", "US", "4711","911222333","1920-10-10"],
+        [endpoints.add_funds, "US_1",20],
+        [endpoints.local_transfer,"US_0","US_0",5],
+        [endpoints.local_transfer,"US_1","US_0",5],
+        [endpoints.international_transfer,"US_0","US_0",5],
         [endpoints.freeze_account,"EUR_0"],
         [endpoints.international_transfer,"EUR_0","US_0",5],
-        [endpoints.international_transfer,"US_0","EUR_0",5],
-        [endpoints.local_transfer,"US_0","US_0",5],
-        [endpoints.international_transfer,"EUR_0","EUR_0",5],
+        [endpoints.international_transfer,"US_1","EUR_0",5],
+        [endpoints.add_funds, "EUR_0",20],
+        [endpoints.add_funds, "US_0",20],
+        [endpoints.retrieve_funds,"EUR_0",5],
+        [endpoints.retrieve_funds,"US_0",5],
         [endpoints.unfreeze_account,"US_0"],
         [endpoints.unfreeze_account,"EUR_0"],
-
-
-
-
-
-
     ]
     //const population = generate_population(100)
     
-    const fitness_e = fitness(test_fitness)
-    //const solution = SimulatedAnnealing(100000)
-    console.log(fitness_e)
+    //const fitness_e = fitness(test_fitness)
+    const solution = hillClimbing(10000)
+    //console.log(fitness_e)
 
-    //pretty_print_population(solution)
+    pretty_print_population(solution)
     
     res.send('Well done!');
 })
