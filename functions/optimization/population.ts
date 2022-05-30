@@ -38,7 +38,7 @@ function generate_create_account(): Datatype {
 
 function generate_deposit_funds(): Datatype {
 
-    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
     const ammount = getRandomInt(0,1000)
 
     return [endpoints.add_funds,account,ammount]
@@ -46,8 +46,8 @@ function generate_deposit_funds(): Datatype {
 }
 
 function generate_local_transfer_funds(): Datatype {
-    const account1 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
-    const account2 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+    const account1 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account2 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
 
     const ammount = getRandomInt(0,1000)
 
@@ -55,28 +55,28 @@ function generate_local_transfer_funds(): Datatype {
 }
 
 function generate_freeze_account(): Datatype {
-    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
 
     return [endpoints.freeze_account, account]
 }
 
 function generate_unfreeze_account(): Datatype {
-    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
 
-    return [endpoints.freeze_account, account]
+    return [endpoints.unfreeze_account, account]
 }
 
 function generate_international_transfer_funds(): Datatype {
-    const account1 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
-    const account2 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+    const account1 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account2 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
 
     const ammount = getRandomInt(0,1000)
 
-    return [endpoints.local_transfer,account1,account2,ammount]
+    return [endpoints.international_transfer,account1,account2,ammount]
 }
 
 function cashout_funds(): Datatype{
-    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,100)}`
+    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
     const ammount = getRandomInt(0,1000)
 
     return [endpoints.retrieve_funds,account,ammount]
@@ -126,7 +126,7 @@ function generate_datatype(endpoint: number): Datatype {
 
 function deletion(population: Population): Population {
     
-    let new_population: Population = [...population]
+    let new_population: Population = population
 
     if(new_population.length == 0) return new_population
 
@@ -138,16 +138,23 @@ function deletion(population: Population): Population {
 }
 
 function addition(population: Population): Population {
-    let new_population: Population = [...population]
+    let new_population: Population = population
 
     const element = get_random_element()
     new_population.push(element)
+
+    const element1 = randomInt(0,new_population.length)
+    const element2 = new_population.length - 1
+
+    const element1_value = [...new_population[element1]]
+    new_population[element1] = [...new_population[element2]]
+    new_population[element2] = element1_value
 
     return new_population
 }
 
 function reordering(population: Population): Population {
-    let new_population: Population = [...population]
+    let new_population: Population = population
 
     if(new_population.length == 0) return new_population
 
@@ -161,29 +168,33 @@ function reordering(population: Population): Population {
     return new_population
 }
 
-export function permutation(population: Population,changes: number = 3): Population {
+export function permutation(population: Population,changes: number = 10): Population {
     
     let new_population: Population = [...population]
 
-    const deletions = randomInt(0,changes)
 
-    for(let i = 0; i < deletions; i++){
+    for(let i = 0; i < changes; i++){
+
+        const change = randomInt(0,3)
+
+        if(change == 0) {
+
+            new_population = deletion(new_population)
+        }
+
+        if(change == 1){
+
+            new_population = addition(new_population)
         
-        new_population = deletion(new_population)
+        }
+
+        if(change == 2) {
+
+            new_population = reordering(new_population)
+
+        }
     }
-
-    const additions = randomInt(0,changes)
-
-    for(let i = 0; i < additions; i++){
-      new_population = addition(new_population)
-    }
-
-    const reorderings = randomInt(0,changes)
-
-    for(let i = 0; i < reorderings; i++){
-        new_population = reordering(new_population)
-    }
-
+    
     return new_population
 }
 

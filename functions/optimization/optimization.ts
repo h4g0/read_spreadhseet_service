@@ -34,7 +34,7 @@ export function SimulatedAnnealing(iterations: number = 1000){
     let best_evaluation = fitness(best_solution)[0]
     let final_solution = best_solution
     let final_evaluation = best_evaluation
-
+    
     const temperature = iterations
 
 
@@ -45,12 +45,17 @@ export function SimulatedAnnealing(iterations: number = 1000){
         const neighboor = permutation(best_solution)
         const neighboor_evaluation = fitness(neighboor)[0]
 
-        const delta = 1 - iteration / temperature
+        const temp_curr = temperature / (iteration + 1)
         const diff = neighboor_evaluation - best_evaluation
+        const exp = Math.exp((diff)/temp_curr)
 
-        const random_number = randomInt(0,temperature) / temperature
+        const random_number = Math.random()
 
-        if(diff > 0 || random_number < delta){
+        if(diff > 0 || exp > random_number){
+
+            /*if(exp > random_number && diff < 0){
+                console.log(`iteration:${iteration} exp:${exp} temp:${temp_curr}`)
+            }*/
             best_solution = neighboor
             best_evaluation = neighboor_evaluation
 
@@ -60,7 +65,7 @@ export function SimulatedAnnealing(iterations: number = 1000){
             }
         }
 
-        console.log(`${best_evaluation} ${final_evaluation} ${random_number} ${delta}`)
+        if(iteration % 100 == 0) console.log(`${best_evaluation} ${final_evaluation} ${temp_curr} ${iteration}`)
     }
 
 

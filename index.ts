@@ -80,9 +80,10 @@ app.get('/', async (req: any, res: any) => {
     
     //const fitness_e = fitness(test_fitness)
     const solution = hillClimbing(10000)
+    console.log(fitness(solution))
     //console.log(fitness_e)
 
-    pretty_print_population(solution)
+    ///pretty_print_population(solution)
     
     res.send('Well done!');
 })
