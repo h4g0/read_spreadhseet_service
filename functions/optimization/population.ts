@@ -1,11 +1,11 @@
 import * as Faker from "@faker-js/faker"
-import { randomInt } from "crypto";
 
 export type Datatype = any[]
 
 type ParametersPopulation = [number, Datatype][]
 
 export type Population = any[][]
+const max_accounts = 10
 
 function getRandomInt(min: number, max: number) {
     min = Math.ceil(min);
@@ -25,9 +25,27 @@ export enum endpoints {
 
 const number_endpoints = 7
 
+function generate_country_code(): string {
+    
+    const r = getRandomInt(0,5)
+
+    if(r == 0) return "US"
+
+    if(r == 1) return "FR"
+
+    if(r == 2) return "KZ"
+
+    if(r == 3) return "ES"
+
+    if(r == 4) return "CHN"
+
+    return "US"
+
+}
+
 function generate_create_account(): Datatype {
     const name = Faker.default.name.findName()
-    const country = Faker.default.address.countryCode()
+    const country = generate_country_code()
     const address = Faker.default.address.zipCode()
     const phone = Faker.faker.phone.imei()
     const datebirth = Faker.default.date.past(100)
@@ -38,7 +56,7 @@ function generate_create_account(): Datatype {
 
 function generate_deposit_funds(): Datatype {
 
-    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account =`${getRandomInt(0,2) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
     const ammount = getRandomInt(0,1000)
 
     return [endpoints.add_funds,account,ammount]
@@ -46,8 +64,8 @@ function generate_deposit_funds(): Datatype {
 }
 
 function generate_local_transfer_funds(): Datatype {
-    const account1 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
-    const account2 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account1 =`${getRandomInt(0,2) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account2 =`${getRandomInt(0,2) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
 
     const ammount = getRandomInt(0,1000)
 
@@ -55,20 +73,20 @@ function generate_local_transfer_funds(): Datatype {
 }
 
 function generate_freeze_account(): Datatype {
-    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account =`${getRandomInt(0,2) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
 
     return [endpoints.freeze_account, account]
 }
 
 function generate_unfreeze_account(): Datatype {
-    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account =`${getRandomInt(0,2) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
 
     return [endpoints.unfreeze_account, account]
 }
 
 function generate_international_transfer_funds(): Datatype {
-    const account1 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
-    const account2 =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account1 =`${getRandomInt(0,2) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account2 =`${getRandomInt(0,2) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
 
     const ammount = getRandomInt(0,1000)
 
@@ -76,7 +94,7 @@ function generate_international_transfer_funds(): Datatype {
 }
 
 function cashout_funds(): Datatype{
-    const account =`${getRandomInt(0,1) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
+    const account =`${getRandomInt(0,2) == 0 ? "US" : "EUR"}_${getRandomInt(0,10)}`
     const ammount = getRandomInt(0,1000)
 
     return [endpoints.retrieve_funds,account,ammount]
@@ -130,7 +148,7 @@ function deletion(population: Population): Population {
 
     if(new_population.length == 0) return new_population
 
-    const random_pos = randomInt(0, new_population.length)
+    const random_pos = getRandomInt(0, new_population.length)
     new_population.splice(random_pos, 1)
 
     return new_population
@@ -143,7 +161,7 @@ function addition(population: Population): Population {
     const element = get_random_element()
     new_population.push(element)
 
-    const element1 = randomInt(0,new_population.length)
+    const element1 = getRandomInt(0,new_population.length)
     const element2 = new_population.length - 1
 
     const element1_value = [...new_population[element1]]
@@ -158,8 +176,8 @@ function reordering(population: Population): Population {
 
     if(new_population.length == 0) return new_population
 
-    const element1 = randomInt(0,new_population.length)
-    const element2 = randomInt(0,new_population.length)
+    const element1 = getRandomInt(0,new_population.length)
+    const element2 = getRandomInt(0,new_population.length)
 
     const element1_value = [...new_population[element1]]
     new_population[element1] = [...new_population[element2]]
@@ -168,14 +186,14 @@ function reordering(population: Population): Population {
     return new_population
 }
 
-export function permutation(population: Population,changes: number = 10): Population {
+export function permutation(population: Population,changes: number = 5): Population {
     
     let new_population: Population = [...population]
 
 
     for(let i = 0; i < changes; i++){
 
-        const change = randomInt(0,3)
+        const change = getRandomInt(0,3)
 
         if(change == 0) {
 
@@ -199,7 +217,7 @@ export function permutation(population: Population,changes: number = 10): Popula
 }
 
 function get_random_element(): Datatype {
-    const endpoint = randomInt(0,number_endpoints)
+    const endpoint = getRandomInt(0,number_endpoints)
     const datatype = generate_datatype(endpoint)
     
     return datatype
@@ -211,6 +229,18 @@ export function generate_population(size: number = 10): Population {
     for(let i = 0; i < size; i++){
        const element = get_random_element()
        population.push(element)
+    }
+
+    return population
+}
+
+export function test_generate_population(type: number): Population {
+    let population: Population  = []
+    
+    for(let i = 0; i < 20; i++){
+        const datatype = generate_datatype(type)
+        
+        population.push(datatype)
     }
 
     return population

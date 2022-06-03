@@ -1,7 +1,7 @@
 const express = require('express');
 import { fitness, pretty_print_population } from "./functions/optimization/fitness";
 import { hillClimbing, SimulatedAnnealing } from "./functions/optimization/optimization";
-import { endpoints, generate_population } from "./functions/optimization/population";
+import { endpoints, generate_population, permutation, test_generate_population } from "./functions/optimization/population";
 import routes from "./routes/index"
 
 const bodyParser = require('body-parser')
@@ -76,14 +76,25 @@ app.get('/', async (req: any, res: any) => {
         [endpoints.unfreeze_account,"US_0"],
         [endpoints.unfreeze_account,"EUR_0"],
     ]
-    //const population = generate_population(100)
     
+    /*const population = generate_population(10)
+    
+    pretty_print_population(population)
+
+    const new_population = permutation(population)
+
+    pretty_print_population(new_population)*/
     //const fitness_e = fitness(test_fitness)
-    const solution = hillClimbing(10000)
+    const solution = SimulatedAnnealing(10000)
+
     console.log(fitness(solution))
+    console.log(solution.length)
+
+    //console.log(test_generate_population(6))
+    //console.log(fitness(solution))
     //console.log(fitness_e)
 
-    ///pretty_print_population(solution)
+    //pretty_print_population(solution)
     
     res.send('Well done!');
 })

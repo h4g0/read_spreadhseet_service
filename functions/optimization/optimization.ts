@@ -20,7 +20,7 @@ export function hillClimbing(iterations: number = 1000){
             best_evaluation = neighboor_evaluation
         }
 
-        console.log(`${best_evaluation} ${iteration}`)
+        if(iteration % 1000 == 0) console.log(`${best_evaluation} ${iteration}`)
     }
 
 
@@ -35,7 +35,7 @@ export function SimulatedAnnealing(iterations: number = 1000){
     let final_solution = best_solution
     let final_evaluation = best_evaluation
     
-    const temperature = iterations
+    const temperature = 40
 
 
     while(iteration < iterations) {
@@ -45,13 +45,13 @@ export function SimulatedAnnealing(iterations: number = 1000){
         const neighboor = permutation(best_solution)
         const neighboor_evaluation = fitness(neighboor)[0]
 
-        const temp_curr = temperature / (iteration + 1)
+        const temp_curr = temperature * Math.pow(0.99, iteration / 10)
         const diff = neighboor_evaluation - best_evaluation
         const exp = Math.exp((diff)/temp_curr)
 
         const random_number = Math.random()
 
-        if(diff > 0 || exp > random_number){
+        if((diff > 0 || random_number < exp)){
 
             /*if(exp > random_number && diff < 0){
                 console.log(`iteration:${iteration} exp:${exp} temp:${temp_curr}`)
@@ -65,7 +65,7 @@ export function SimulatedAnnealing(iterations: number = 1000){
             }
         }
 
-        if(iteration % 100 == 0) console.log(`${best_evaluation} ${final_evaluation} ${temp_curr} ${iteration}`)
+        if(iteration % 100 == 0) console.log(`${best_evaluation} ${final_evaluation} ${exp} ${iteration} ${temp_curr}`)
     }
 
 

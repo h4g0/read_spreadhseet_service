@@ -464,7 +464,7 @@ export function pretty_print_population(population: Population): void {
     }
 }
 
-export function fitness(population: Population,coverage: number=0.8, tests: number=0.2): [number,Set<unknown>] {
+export function fitness(population: Population,penalty: number = 0.01): [number,Set<unknown>] {
     let fit = 0
 
     const traces = new Set()
@@ -480,6 +480,6 @@ export function fitness(population: Population,coverage: number=0.8, tests: numb
 
 
 
-    fit = traces.size
+    fit = traces.size  - penalty * population.length
     return [fit,traces]
 }
