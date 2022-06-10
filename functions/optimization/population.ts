@@ -1,4 +1,5 @@
 import * as Faker from "@faker-js/faker"
+import { fitness } from "./fitness"
 
 export type Datatype = any[]
 
@@ -232,6 +233,87 @@ export function generate_population(size: number = 10): Population {
     }
 
     return population
+}
+
+function crossover(population1: Population,population2: Population): Population {
+    const new_population: Population = []
+
+    const crossover_point1 = getRandomInt(0,population1.length)
+    const crossover_point2 = getRandomInt(0,population2.length)
+
+    for(let i = 0; i < crossover_point1; i++)
+        new_population.push([...population1[i]])
+
+    for(let i = crossover_point2; i < population2.length; i++)
+        new_population.push([...population2[i]])
+
+    return new_population
+}
+
+function mutate_population_ga(population: Population[],mutations: number = 3): Population[]{
+    
+    const new_population = population
+
+    for(let i = 0; i < mutations; i++){
+        const random_pos = getRandomInt(0,population.length)
+
+        const changed_element = permutation(population[random_pos])
+
+        new_population[random_pos] = changed_element
+    }
+
+    return new_population
+}
+
+export function generate_new_population_ga(population: Population[],best: number = 5): Population[]{
+
+    const fitness_dic = new Map<string,number>()
+
+    population = mutate_population_ga(population)
+
+    for(let element of population){
+        fitness_dic.set(JSON.stringify(element),fitness(element)[0])
+    }
+
+    const get_fitness = (x: Population) => {
+        const f = fitness_dic.get(JSON.stringify(x)) || 0 
+
+        return f
+    }
+
+    const ordered_population = population.sort((x: Population,y: Population) => get_fitness(y) - get_fitness(x) )
+
+    const new_population = ordered_population.slice(0,best)
+
+    
+    for(let i = best; i < 10; i++){
+        const parent1 = getRandomInt(0,best)
+        const parent2 = getRandomInt(0,best)
+
+       
+        const new_element =  crossover(ordered_population[parent1],ordered_population[parent2])
+
+        new_population.push(new_element)
+    }
+
+    return (new_population)
+}  
+
+export function get_best_population_ga(population: Population[]): Population {
+    //const ordered_population = (population).sort((x: Population,y: Population) => fitness(y)[0] -  fitness(x)[0])
+    const ordered_population = population
+    
+    return [...ordered_population[0]]
+}
+
+export function generate_population_ga(size: number = 10): Population[]{
+    const ga_population: Population[] = []
+
+    for(let i = 0 ; i < size; i++){
+        ga_population.push(generate_population())
+    }
+
+    return ga_population
 }
 
 export function test_generate_population(type: number): Population {

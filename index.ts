@@ -1,8 +1,28 @@
 const express = require('express');
 import { fitness, pretty_print_population } from "./functions/optimization/fitness";
-import { hillClimbing, SimulatedAnnealing } from "./functions/optimization/optimization";
+import { GeneticAlgorithm, hillClimbing, SimulatedAnnealing, TabuSearch } from "./functions/optimization/optimization";
 import { endpoints, generate_population, permutation, test_generate_population } from "./functions/optimization/population";
 import routes from "./routes/index"
+
+const fs = require('fs');
+
+const content = 'Some content!';
+
+function roundToTwo(num: any) {
+    //@ts-ignore
+    return +(Math.round(num + "e+2")  + "e-2");
+}
+
+const write_to_file = (file: string,content: string) => {
+
+ fs.writeFile(file, content, (err: any)=> {
+  if (err) {
+    console.error(err);
+  }
+  // file written successfully
+});
+}
+
 
 const bodyParser = require('body-parser')
 const dotenv = require('dotenv')
@@ -77,19 +97,177 @@ app.get('/', async (req: any, res: any) => {
         [endpoints.unfreeze_account,"EUR_0"],
     ]
     
-    /*const population = generate_population(10)
+    const solution = GeneticAlgorithm(1000)
+
+
+    /*const population = generate_population(20)
     
+    console.log(population)
+    /*const population2 = [...population]
+
     pretty_print_population(population)
 
     const new_population = permutation(population)
 
-    pretty_print_population(new_population)*/
-    //const fitness_e = fitness(test_fitness)
-    const solution = SimulatedAnnealing(10000)
+    pretty_print_population(new_population)
+    //const fitness_e = fitness(test_fitness)*/
 
-    console.log(fitness(solution))
-    console.log(solution.length)
 
+
+    /*const combinations = (options: any[][]) => {
+        if(options.length == 0) return []
+        if(options.length == 1){
+            return options[0].map((x: any) => [x])
+        }
+
+        const combinations_next: any[][] = combinations(options.slice(1))
+        let final_combinations: any[][] = []
+
+        for(let option of options[0]){
+            for(let combination of combinations_next){
+                const new_combination: any[] = []
+               
+                new_combination.push(option)
+                for(let parameter of combination)
+                    new_combination.push(parameter)
+
+                final_combinations.push(new_combination)
+            }
+        }
+
+        return final_combinations
+    }
+
+    //let parameters = [[1,2,3],[0.01,0.1],[30,40,50]]
+    let parameters = [[1,2,3],[0.01,0.1]]
+
+    const combs = combinations(parameters)
+
+
+    const tests = 10
+
+    const run_values = [2000,5000,10000]
+
+    for(let comb of combs){
+        
+        for(let runs of run_values){
+
+       
+        let solutions = []
+
+        const currentDateTime = new Date();
+
+        for(let i = 0; i < tests; i++)
+            //solutions.push(SimulatedAnnealing(runs,comb[0],comb[1],comb[2]))
+            solutions.push(hillClimbing(runs,comb[0],comb[1]))
+
+        const endTime = new Date();
+        const timeDiff = endTime.getTime() - currentDateTime.getTime(); //in ms
+            // strip the ms
+        const time = roundToTwo(timeDiff / 1000 / 10)
+
+        let average = [0,0,0]
+
+
+        for(let i = 0; i < tests; i++)
+        {
+            average[0] += solutions[i][0]
+            average[1] += solutions[i][1]
+            average[2] += solutions[i][2]
+        }
+
+        average[0] = roundToTwo(average[0]/tests)
+        average[1] = roundToTwo(average[1]/tests)
+        average[2] = roundToTwo(average[2]/tests)
+   
+        const latex_line = `${comb.join(" , ")} , ${runs} & ${average[0]} & ${average[1]} & ${average[2]} & ${time} \\\\`
+        console.log(latex_line)
+        console.log("\\hline")
+    }
+    }*/
+    /*
+    const solution = SimulatedAnnealing(10000,1,40)
+    text+= "SA(1,40)"
+
+    console.log(solution)
+
+    const solution2 = SimulatedAnnealing(10000,2,40)
+    text+= ";SA(2,40)"
+
+    console.log(solution2)
+
+
+    const solution3 = SimulatedAnnealing(10000,3,40)
+    text+= ";SA(3,40)"
+    console.log(solution3)
+
+    const solution4 = SimulatedAnnealing(10000,1,50)
+    text+= ";SA(1,50)"
+    console.log(solution4)
+
+
+    const solution5 = SimulatedAnnealing(10000,2,50)
+    text+= ";SA(2,50)"
+    console.log(solution5)
+
+
+    const solution6 = SimulatedAnnealing(10000,3,50)
+    text+= ";SA(3,50)"
+    console.log(solution6)
+
+
+
+
+    const solution7 = SimulatedAnnealing(10000,1,30)
+    text+= ";SA(1,30)"
+    console.log(solution7)
+
+
+    const solution8 = SimulatedAnnealing(10000,2,30)
+    text+= ";SA(2,30)"
+    console.log(solution8)
+
+
+    const solution9 = SimulatedAnnealing(10000,3,30)
+    text+= ";SA(3,30)"
+    console.log(solution9)
+
+
+
+    const solution10 = hillClimbing(10000,1)
+    text+= ";HC(1)"
+    console.log(solution10)
+
+    const solution11 = hillClimbing(10000,2)
+    text+= ";HC(2)"
+    console.log(solution11)
+
+
+    const solution12 = hillClimbing(10000,3)
+    text+= ";HC(3)"
+    console.log(solution12)
+
+
+    
+    text += "\n"
+    */
+
+    /*const solution = SimulatedAnnealing(10000, 2 , 0.01 , 30 , )
+    const solution2 = hillClimbing(10000, 2 , 0.01)
+
+    console.log(Array.from(fitness(solution)[1]).sort())
+    console.log(Array.from(fitness(solution2)[1]).sort())*/
+
+    /*
+    let text = "Simulated Annealing;Hill Climbing\n"
+
+    for(let i = 0; i < solution.length; i++){
+        text += `${solution[i]};${solution2[i]}`
+       
+        text += "\n"
+    }
+    */
+    //write_to_file("test3.csv", text)
     //console.log(test_generate_population(6))
     //console.log(fitness(solution))
     //console.log(fitness_e)
