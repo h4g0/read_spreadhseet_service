@@ -1,5 +1,5 @@
 import { randomInt } from "crypto"
-import { fitness } from "./fitness"
+import { fitness, restart_fitness_cache } from "./fitness"
 import { generate_new_population_ga, generate_population, generate_population_ga, get_best_population_ga, permutation, Population } from "./population"
 
 export function hillClimbing(iterations: number = 1000,changes: number = 5,penalty: number = 0.01){
@@ -22,7 +22,7 @@ export function hillClimbing(iterations: number = 1000,changes: number = 5,penal
             best_evaluation = neighboor_evaluation
         }
 
-        fitness_itaration.push(fitness(best_solution)[1].size)
+        fitness_itaration.push(best_solution.length)
 
         //if(iteration % 1000 == 0) console.log(`${best_evaluation} ${iteration}`)
     }
@@ -30,7 +30,7 @@ export function hillClimbing(iterations: number = 1000,changes: number = 5,penal
 
     //return [best_evaluation,fitness(best_solution)[1].size,best_solution.length]
 
-    return  best_solution
+    return  fitness_itaration
 }
 
 export function SimulatedAnnealing(iterations: number = 1000,changes: number=5,penalty: number = 0.01,temperature: number = 40){
@@ -73,7 +73,7 @@ export function SimulatedAnnealing(iterations: number = 1000,changes: number=5,p
             }
         }
 
-        fitness_itaration.push(fitness(best_solution)[1].size)
+        fitness_itaration.push(best_solution.length)
 
         //if(iteration % 100 == 0) console.log(`${best_evaluation} ${final_evaluation} ${exp} ${iteration} ${temp_curr}`)
     }
@@ -81,7 +81,7 @@ export function SimulatedAnnealing(iterations: number = 1000,changes: number=5,p
 
     //return [final_evaluation,fitness(final_solution)[1].size,final_solution.length]
 
-    return final_solution
+    return fitness_itaration
 }
 
 export function TabuSearch(iterations: number = 1000,tabuListSize: number = 20){
@@ -152,24 +152,28 @@ export function TabuSearch(iterations: number = 1000,tabuListSize: number = 20){
 }
 
 
+let fitnesses = new Map<string,number>()
 
-export function GeneticAlgorithm(iterations: number = 1000){
+
+export function GeneticAlgorithm(iterations: number = 1000,size: number = 20,best: number = 5,discount: number = 0.01){
     
+
+    restart_fitness_cache()
 
     let iteration = 0
-    let population = generate_population_ga(10)
+    let population = generate_population_ga(size)
     let best_solution = get_best_population_ga(population)
-    let best_evaluation = fitness(best_solution)[0]
-    
+    let best_evaluation = fitness(best_solution,discount)[0]
+    let fitness_itaration = []
 
     while(iteration < iterations) {
         iteration += 1
 
-        population = generate_new_population_ga(population)
+        population = generate_new_population_ga(population,size,best,discount)
         
         const best_new_solution =  get_best_population_ga(population)
 
-        const best_new_evaluation = fitness(best_new_solution)[0]
+        const best_new_evaluation = fitness(best_new_solution,discount)[0]
     
         const diff = best_new_evaluation - best_evaluation
 
@@ -181,9 +185,11 @@ export function GeneticAlgorithm(iterations: number = 1000){
 
         }
 
-        if(iteration % 100 == 0) console.log(`${best_evaluation} ${iteration}`)
+        fitness_itaration.push(best_solution.length)
+
+        //if(iteration % 100 == 0) console.log(`${best_evaluation} ${iteration} ${best_solution.length} ${fitness(best_solution)[1].size}`)
     }
 
 
-    return best_solution
+    return fitness_itaration
 }

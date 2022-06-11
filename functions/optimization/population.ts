@@ -8,6 +8,8 @@ type ParametersPopulation = [number, Datatype][]
 export type Population = any[][]
 const max_accounts = 10
 
+const fitness_dic = new Map<string,number>()
+
 function getRandomInt(min: number, max: number) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -187,7 +189,7 @@ function reordering(population: Population): Population {
     return new_population
 }
 
-export function permutation(population: Population,changes: number = 5): Population {
+export function permutation(population: Population,changes: number = 1): Population {
     
     let new_population: Population = [...population]
 
@@ -238,7 +240,7 @@ export function generate_population(size: number = 10): Population {
 function crossover(population1: Population,population2: Population): Population {
     const new_population: Population = []
 
-    const crossover_point1 = getRandomInt(0,population1.length)
+    const crossover_point1 = getRandomInt(0,population1.length) 
     const crossover_point2 = getRandomInt(0,population2.length)
 
     for(let i = 0; i < crossover_point1; i++)
@@ -250,7 +252,28 @@ function crossover(population1: Population,population2: Population): Population 
     return new_population
 }
 
-function mutate_population_ga(population: Population[],mutations: number = 3): Population[]{
+export function test_crossover(){
+    let population = generate_population_ga(20)
+
+    const fitness_dic = new Map<string,number>()
+
+    let best = 5
+
+    
+    console.log(population.map((x: Population) => x.length))
+    
+    for(let i = 0; i < 100; i++){
+        population = population.sort( (x: any,y: any) => getRandomInt(0,3) - 1).slice(0,5)
+
+        for(let n = 5; n < 10; n++)
+            population.push(crossover(population[getRandomInt(0,5)],population[getRandomInt(0,5)]))
+
+        console.log(population.map((x: Population) => x.length))
+
+    }
+    
+}
+function mutate_population_ga(population: Population[],mutations: number = 20): Population[]{
     
     const new_population = population
 
@@ -265,38 +288,24 @@ function mutate_population_ga(population: Population[],mutations: number = 3): P
     return new_population
 }
 
-export function generate_new_population_ga(population: Population[],best: number = 5): Population[]{
+export function generate_new_population_ga(population: Population[],size: number = 10,best: number = 3,discount: number = 0.01): Population[]{
 
-    const fitness_dic = new Map<string,number>()
-
-    population = mutate_population_ga(population)
-
-    for(let element of population){
-        fitness_dic.set(JSON.stringify(element),fitness(element)[0])
-    }
-
-    const get_fitness = (x: Population) => {
-        const f = fitness_dic.get(JSON.stringify(x)) || 0 
-
-        return f
-    }
-
-    const ordered_population = population.sort((x: Population,y: Population) => get_fitness(y) - get_fitness(x) )
+    const ordered_population = population.sort((x: Population,y: Population) => fitness(y,discount)[0] - fitness(x,discount)[0] )
 
     const new_population = ordered_population.slice(0,best)
 
     
-    for(let i = best; i < 10; i++){
+    for(let i = best; i < size; i++){
         const parent1 = getRandomInt(0,best)
         const parent2 = getRandomInt(0,best)
 
        
-        const new_element =  crossover(ordered_population[parent1],ordered_population[parent2])
+        const new_element =  permutation(crossover(ordered_population[parent1],ordered_population[parent2]),3)
 
         new_population.push(new_element)
     }
 
-    return (new_population)
+    return  new_population
 }  
 
 export function get_best_population_ga(population: Population[]): Population {

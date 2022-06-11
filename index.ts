@@ -1,7 +1,7 @@
 const express = require('express');
 import { fitness, pretty_print_population } from "./functions/optimization/fitness";
 import { GeneticAlgorithm, hillClimbing, SimulatedAnnealing, TabuSearch } from "./functions/optimization/optimization";
-import { endpoints, generate_population, permutation, test_generate_population } from "./functions/optimization/population";
+import { endpoints, generate_population, permutation, test_crossover, test_generate_population } from "./functions/optimization/population";
 import routes from "./routes/index"
 
 const fs = require('fs');
@@ -97,8 +97,6 @@ app.get('/', async (req: any, res: any) => {
         [endpoints.unfreeze_account,"EUR_0"],
     ]
     
-    const solution = GeneticAlgorithm(1000)
-
 
     /*const population = generate_population(20)
     
@@ -138,13 +136,16 @@ app.get('/', async (req: any, res: any) => {
         return final_combinations
     }
 
+
+    //const solution = GeneticAlgorithm(10000,10,5,0.02)
+
     //let parameters = [[1,2,3],[0.01,0.1],[30,40,50]]
-    let parameters = [[1,2,3],[0.01,0.1]]
+    let parameters = [[5,10],[5,2],[0.01,0.02,0.03]]
 
     const combs = combinations(parameters)
 
 
-    const tests = 10
+    const tests = 2
 
     const run_values = [2000,5000,10000]
 
@@ -153,18 +154,22 @@ app.get('/', async (req: any, res: any) => {
         for(let runs of run_values){
 
        
-        let solutions = []
+        let solutions: number[][] = []
 
         const currentDateTime = new Date();
 
-        for(let i = 0; i < tests; i++)
+        for(let i = 0; i < tests; i++){
+            const s = (GeneticAlgorithm(runs,comb[0],comb[1],comb[2]))
+            const f = fitness(s)
+            solutions.push([f[0],f[1].size,s.length])
+        }
             //solutions.push(SimulatedAnnealing(runs,comb[0],comb[1],comb[2]))
-            solutions.push(hillClimbing(runs,comb[0],comb[1]))
+            //solutions.push(hillClimbing(runs,comb[0],comb[1]))
 
         const endTime = new Date();
         const timeDiff = endTime.getTime() - currentDateTime.getTime(); //in ms
             // strip the ms
-        const time = roundToTwo(timeDiff / 1000 / 10)
+        const time = roundToTwo(timeDiff / 1000 / tests)
 
         let average = [0,0,0]
 
@@ -252,22 +257,22 @@ app.get('/', async (req: any, res: any) => {
     text += "\n"
     */
 
-    /*const solution = SimulatedAnnealing(10000, 2 , 0.01 , 30 , )
+    const solution = SimulatedAnnealing(10000, 2 , 0.01 , 30 , )
     const solution2 = hillClimbing(10000, 2 , 0.01)
+    const soltuion3 =  GeneticAlgorithm(10000,10,2,0.03)
+    //console.log(Array.from(fitness(solution)[1]).sort())
+    //console.log(Array.from(fitness(solution2)[1]).sort())*/
 
-    console.log(Array.from(fitness(solution)[1]).sort())
-    console.log(Array.from(fitness(solution2)[1]).sort())*/
-
-    /*
-    let text = "Simulated Annealing;Hill Climbing\n"
+    
+    let text = "Simulated Annealing;Hill Climbing;Genetic algorithm\n"
 
     for(let i = 0; i < solution.length; i++){
-        text += `${solution[i]};${solution2[i]}`
+        text += `${solution[i]};${solution2[i]};${soltuion3[i]}`
        
         text += "\n"
     }
-    */
-    //write_to_file("test3.csv", text)
+    
+    write_to_file("test5.csv", text)
     //console.log(test_generate_population(6))
     //console.log(fitness(solution))
     //console.log(fitness_e)

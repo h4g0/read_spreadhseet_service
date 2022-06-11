@@ -464,7 +464,17 @@ export function pretty_print_population(population: Population): void {
     }
 }
 
+const fitness_dic = new Map<string, [number,Set<unknown>]>()
+
+export function restart_fitness_cache(){
+    fitness_dic.clear()
+}
+
 export function fitness(population: Population,penalty: number = 0.01): [number,Set<unknown>] {
+    const past_fitness = fitness_dic.get(JSON.stringify(population)) || [0, new Set()]
+
+    if(past_fitness[0] != 0) return past_fitness
+    
     let fit = 0
 
     const traces = new Set()
@@ -481,5 +491,8 @@ export function fitness(population: Population,penalty: number = 0.01): [number,
 
 
     fit = traces.size  - penalty * population.length
+
+    fitness_dic.set(JSON.stringify(population), [fit,traces])
+
     return [fit,traces]
 }
